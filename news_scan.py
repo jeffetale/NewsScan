@@ -158,7 +158,7 @@ class AdvancedSentimentAnalyzer:
             print("⚠️  Transformers library not available")
     
     def analyze_sentiment(self, text: str) -> Dict:
-        """Comprehensive sentiment analysis using multiple methods"""
+        """Comprehensive sentiment analysis with improved error handling and normalization"""
         # VADER analysis
         vader_scores = self.vader.polarity_scores(text)
         
@@ -170,59 +170,78 @@ class AdvancedSentimentAnalyzer:
         # Advanced model analysis (if available)
         finbert_score = 0
         finbert_label = "neutral"
+        finbert_confidence = 0
         
         if self.finbert:
             try:
-                # Truncate text to avoid token limits
+                # Truncate and clean text for better processing
                 truncated_text = text[:500] if len(text) > 500 else text
-                result = self.finbert(truncated_text)
+                # Remove excessive whitespace and newlines
+                cleaned_text = ' '.join(truncated_text.split())
+                
+                result = self.finbert(cleaned_text)
                 
                 # Handle different model output formats
                 if isinstance(result, list) and len(result) > 0:
                     result = result[0]
                 
                 finbert_label = result['label'].lower()
-                finbert_score = result['score']
+                finbert_confidence = result.get('score', 0)
                 
-                # Normalize scores based on model type
+                # Enhanced normalization based on model type with confidence weighting
                 if self.model_name == "ProsusAI/finbert":
                     # FinBERT uses positive/negative/neutral
                     if finbert_label in ['negative', 'neg']:
-                        finbert_score = -finbert_score
-                    elif finbert_label in ['neutral']:
+                        finbert_score = -finbert_confidence
+                    elif finbert_label in ['positive', 'pos']:
+                        finbert_score = finbert_confidence
+                    else:  # neutral
                         finbert_score = 0
                 else:
-                    # Other models might use different labels
-                    if finbert_label in ['negative', 'neg', 'label_0']:
-                        finbert_score = -finbert_score
-                    elif finbert_label in ['neutral', 'label_1']:
-                        finbert_score = 0
-                    # positive stays positive
+                    # Other models mapping
+                    label_mapping = {
+                        'negative': -finbert_confidence,
+                        'neg': -finbert_confidence,
+                        'label_0': -finbert_confidence,
+                        'positive': finbert_confidence,
+                        'pos': finbert_confidence,
+                        'label_2': finbert_confidence,
+                        'neutral': 0,
+                        'label_1': 0
+                    }
+                    finbert_score = label_mapping.get(finbert_label, 0)
                 
             except Exception as e:
                 print(f"⚠️  Advanced model analysis failed: {e}")
                 finbert_score = 0
                 finbert_label = "error"
+                finbert_confidence = 0
         
-        # Weighted composite score
-        if self.finbert:
+        # Enhanced weighted composite score with confidence adjustment
+        if self.finbert and finbert_confidence > 0.5:  # Only use FinBERT if confident
             composite_score = (
-                vader_scores['compound'] * 0.4 +
-                textblob_polarity * 0.3 +
-                finbert_score * 0.3
+                vader_scores['compound'] * 0.35 +
+                textblob_polarity * 0.25 +
+                finbert_score * 0.40
             )
+            confidence_base = (abs(vader_scores['compound']) + abs(textblob_polarity) + finbert_confidence) / 3
         else:
             composite_score = (
-                vader_scores['compound'] * 0.6 +
-                textblob_polarity * 0.4
+                vader_scores['compound'] * 0.65 +
+                textblob_polarity * 0.35
             )
+            confidence_base = (abs(vader_scores['compound']) + abs(textblob_polarity)) / 2
+        
+        # Apply subjectivity adjustment - more subjective text gets lower confidence
+        subjectivity_penalty = textblob_subjectivity * 0.2
+        final_confidence = max(0.1, confidence_base - subjectivity_penalty)
         
         return {
             'composite': composite_score,
             'vader': vader_scores,
             'textblob': {'polarity': textblob_polarity, 'subjectivity': textblob_subjectivity},
-            'finbert': {'score': finbert_score, 'label': finbert_label},
-            'confidence': abs(composite_score),
+            'finbert': {'score': finbert_score, 'label': finbert_label, 'confidence': finbert_confidence},
+            'confidence': final_confidence,
             'model_used': self.model_name or 'VADER+TextBlob'
         }
 
@@ -486,20 +505,49 @@ class AdvancedSignalGenerator:
         }
     
     def calculate_market_impact(self, text: str) -> float:
-        """Calculate potential market impact based on keyword presence and weights"""
+        """Enhanced market impact calculation with context awareness and keyword clustering"""
         text_lower = text.lower()
-        total_impact = 0
-        keyword_count = 0
+        
+        # Keyword impact calculation with clustering
+        keyword_impacts = []
+        matched_keywords = []
         
         for keyword, weight in self.keyword_weights.items():
             if keyword in text_lower:
-                total_impact += weight
-                keyword_count += 1
+                keyword_impacts.append(weight)
+                matched_keywords.append(keyword)
         
-        # Normalize impact score
-        if keyword_count > 0:
-            return min(total_impact / keyword_count, 1.0)
-        return 0.1  # Base impact for financial news
+        if not keyword_impacts:
+            return 0.15  # Slightly higher base for financial news
+        
+        # Context-aware adjustments
+        context_multiplier = 1.0
+        
+        # Time sensitivity - recent/urgent language increases impact
+        urgent_terms = ['breaking', 'urgent', 'just in', 'alert', 'immediate', 'emergency']
+        if any(term in text_lower for term in urgent_terms):
+            context_multiplier *= 1.3
+        
+        # Source credibility - official sources get higher weight
+        official_terms = ['federal reserve', 'treasury', 'white house', 'sec announces', 'official statement']
+        if any(term in text_lower for term in official_terms):
+            context_multiplier *= 1.25
+        
+        # Market session timing (if timestamp available)
+        current_hour = datetime.now().hour
+        if 9 <= current_hour <= 16:  # Market hours EST
+            context_multiplier *= 1.2
+        
+        # Calculate weighted average impact
+        avg_impact = sum(keyword_impacts) / len(keyword_impacts)
+        
+        # Apply diminishing returns for too many keywords (spam filter)
+        keyword_count_factor = min(1.0, 5.0 / len(keyword_impacts)) if len(keyword_impacts) > 5 else 1.0
+        
+        # Final calculation
+        final_impact = min(1.0, avg_impact * context_multiplier * keyword_count_factor)
+        
+        return final_impact
     
     def _analyze_trump_post(self, content: str, sentiment: Dict, market_impact: float, article: Dict) -> List[Signal]:
         """
@@ -734,7 +782,7 @@ class AdvancedSignalGenerator:
         return signals
     
     def generate_signals(self, article: Dict) -> List[Signal]:
-        """Generate trading signals from news article"""
+        """Enhanced signal generation with improved filtering and validation"""
         title = article.get('title', '')
         description = article.get('description', '')
         content = f"{title}. {description}"
@@ -742,48 +790,75 @@ class AdvancedSignalGenerator:
         source_name = source.get('name')
         source_user = source.get('user')
 
-        # Sentiment analysis
-        sentiment_data = self.sentiment_analyzer.analyze_sentiment(content)
+        # Content quality check - filter out low-quality articles
+        if len(content.strip()) < 20:
+            return []
+        
+        # Check for duplicate/spam content
+        spam_indicators = ['click here', 'subscribe now', 'limited time', '!!!!!']
+        if any(indicator in content.lower() for indicator in spam_indicators):
+            return []
 
-        # Check if the post is from Trump on Truth Social
+        # Enhanced sentiment analysis
+        sentiment_data = self.sentiment_analyzer.analyze_sentiment(content)
+        
+        # Calculate market impact
+        market_impact = self.calculate_market_impact(content)
+        
+        # Early exit if very low impact and weak sentiment
+        if market_impact < 0.2 and sentiment_data['confidence'] < 0.3:
+            return []
+
+        # Trump post special handling
         if source_name == 'Truth Social' and source_user == 'realDonaldTrump':
             print("✅ Detected post from Trump. Applying specialized analysis.")
-            # Manually set a very high impact score
-            market_impact = 0.90
-            # Route to the specialist function and return its signals directly
+            market_impact = max(market_impact, 0.85)  # Ensure minimum high impact
             return self._analyze_trump_post(content, sentiment_data, market_impact, article)
 
-        # If it's not a Trump post, proceed with the general analysis
-        market_impact = self.calculate_market_impact(content)
+        # General signal generation with improved filtering
         signals = []
         for asset_name, asset_config in Config.ASSETS.items():
             signal = self._analyze_asset_impact(
                 asset_name, asset_config, content,
                 sentiment_data, market_impact, article
             )
-            if signal:
+            if signal and signal.confidence > 0.4:  # Minimum confidence threshold
                 signals.append(signal)
 
+        # Remove conflicting signals (same asset, opposite directions, similar timestamps)
+        signals = self._resolve_signal_conflicts(signals)
+        
         return signals
     
     def _analyze_asset_impact(self, asset_name: str, asset_config: Dict, 
-                            content: str, sentiment_data: Dict, 
-                            market_impact: float, article: Dict) -> Optional[Signal]:
-        """Analyze impact on specific asset"""
+                        content: str, sentiment_data: Dict, 
+                        market_impact: float, article: Dict) -> Optional[Signal]:
+        """Enhanced asset impact analysis with improved keyword matching and context"""
         content_lower = content.lower()
         
-        # Check keyword relevance
-        keyword_matches = sum(1 for keyword in asset_config['keywords'] 
-                            if keyword in content_lower)
+        # Multi-level keyword relevance check
+        keyword_matches = 0
+        keyword_strength = 0
         
-        if keyword_matches == 0 and market_impact < 0.5:
-            return None  # Not relevant to this asset
+        for keyword in asset_config['keywords']:
+            if keyword in content_lower:
+                keyword_matches += 1
+                # Weight longer, more specific keywords higher
+                keyword_strength += len(keyword.split())
         
-        # Asset-specific analysis
+        # Enhanced relevance threshold
+        relevance_score = (keyword_matches + keyword_strength * 0.5) * asset_config['weight']
+        
+        # Skip if not relevant enough, unless high market impact
+        if relevance_score < 1.0 and market_impact < 0.6:
+            return None
+        
+        # Asset-specific analysis with improved context
         direction = Direction.NEUTRAL
         reasoning = []
-        confidence = sentiment_data['confidence'] * asset_config['weight']
+        base_confidence = sentiment_data['confidence'] * asset_config['weight']
         
+        # Apply asset-specific analysis
         if asset_name == 'GOLD':
             direction, reasoning = self._analyze_gold(content_lower, sentiment_data)
         elif asset_name == 'BITCOIN':
@@ -793,29 +868,27 @@ class AdvancedSignalGenerator:
         elif asset_name == 'USD':
             direction, reasoning = self._analyze_usd(content_lower, sentiment_data)
         
+        # Enhance confidence based on reasoning strength
+        reasoning_bonus = min(0.2, len(reasoning) * 0.05)
+        final_confidence = min(0.95, base_confidence + reasoning_bonus)
+        
         # Determine signal strength
-        strength = self._determine_strength(confidence, market_impact)
+        strength = self._determine_strength(final_confidence, market_impact, relevance_score)
         
-        final_sentiment_score = sentiment_data['composite']
+        # Enhanced sentiment score alignment
+        final_sentiment_score = self._align_sentiment_with_direction(
+            sentiment_data['composite'], direction, final_confidence
+        )
         
-        # If  rules determined a bullish direction despite negative news sentiment,
-        # reflect that in the score displayed.
-        if direction == Direction.BULLISH and final_sentiment_score < 0:
-            final_sentiment_score = abs(final_sentiment_score)
-        
-        # If rules determined a bearish direction despite positive news sentiment,
-        # reflect that in the score.
-        elif direction == Direction.BEARISH and final_sentiment_score > 0:
-            final_sentiment_score = -abs(final_sentiment_score)
-
-        if direction == Direction.NEUTRAL and strength == SignalStrength.WEAK:
+        # Filter out weak signals unless high market impact
+        if direction == Direction.NEUTRAL or (strength == SignalStrength.WEAK and market_impact < 0.5):
             return None
         
         return Signal(
             asset=asset_name,
             direction=direction,
             strength=strength,
-            confidence=confidence,
+            confidence=final_confidence,
             reasoning=reasoning,
             timestamp=datetime.now(),
             sources=[article.get('url', '')],
@@ -1307,18 +1380,94 @@ class AdvancedSignalGenerator:
         
         return direction, reasoning
     
-    def _determine_strength(self, confidence: float, market_impact: float) -> SignalStrength:
-        """Determine signal strength based on confidence and market impact"""
-        combined_score = (confidence + market_impact) / 2
+    def _determine_strength(self, confidence: float, market_impact: float, relevance_score: float = 1.0) -> SignalStrength:
+        """Enhanced strength determination with multiple factors"""
+        # Weighted combination of factors
+        combined_score = (
+            confidence * 0.4 +
+            market_impact * 0.5 +
+            min(relevance_score / 3.0, 0.3) * 0.1  # Cap relevance contribution
+        )
         
-        if combined_score >= 0.8:
+        # Dynamic thresholds based on market conditions
+        # You could add volatility index or market session adjustments here
+        base_thresholds = {
+            'critical': 0.75,
+            'strong': 0.55,
+            'moderate': 0.35,
+            'weak': 0.0
+        }
+        
+        if combined_score >= base_thresholds['critical']:
             return SignalStrength.CRITICAL
-        elif combined_score >= 0.6:
+        elif combined_score >= base_thresholds['strong']:
             return SignalStrength.STRONG
-        elif combined_score >= 0.3:  # Lowered from 0.4
+        elif combined_score >= base_thresholds['moderate']:
             return SignalStrength.MODERATE
         else:
             return SignalStrength.WEAK
+        
+    def _align_sentiment_with_direction(self, original_sentiment: float, direction: Direction, confidence: float) -> float:
+        """Align sentiment score with determined direction based on analysis confidence"""
+        if direction == Direction.NEUTRAL:
+            return original_sentiment
+        
+        # If we're very confident in our directional analysis, adjust sentiment accordingly
+        if confidence > 0.7:
+            if direction == Direction.BULLISH and original_sentiment < 0:
+                # Our analysis says bullish despite negative sentiment - weight our analysis more
+                return abs(original_sentiment) * 0.8
+            elif direction == Direction.BEARISH and original_sentiment > 0:
+                # Our analysis says bearish despite positive sentiment
+                return -abs(original_sentiment) * 0.8
+        
+        # For lower confidence, blend original sentiment with direction
+        direction_weight = confidence * 0.5  # Max 50% influence
+        sentiment_weight = 1 - direction_weight
+        
+        target_sentiment = 0.7 if direction == Direction.BULLISH else -0.7
+        return original_sentiment * sentiment_weight + target_sentiment * direction_weight
+
+    def _resolve_signal_conflicts(self, signals: List[Signal]) -> List[Signal]:
+        """Resolve conflicting signals for the same asset"""
+        if len(signals) <= 1:
+            return signals
+        
+        # Group signals by asset
+        asset_signals = {}
+        for signal in signals:
+            if signal.asset not in asset_signals:
+                asset_signals[signal.asset] = []
+            asset_signals[signal.asset].append(signal)
+        
+        resolved_signals = []
+        
+        for asset, signal_list in asset_signals.items():
+            if len(signal_list) == 1:
+                resolved_signals.extend(signal_list)
+                continue
+            
+            # Check for conflicts (opposite directions)
+            bullish_signals = [s for s in signal_list if s.direction == Direction.BULLISH]
+            bearish_signals = [s for s in signal_list if s.direction == Direction.BEARISH]
+            
+            if bullish_signals and bearish_signals:
+                # Conflict detected - keep the highest confidence signal
+                all_directional = bullish_signals + bearish_signals
+                best_signal = max(all_directional, key=lambda s: s.confidence * s.market_impact)
+                
+                # Combine reasoning from conflicting signals
+                all_reasoning = []
+                for signal in all_directional:
+                    all_reasoning.extend(signal.reasoning)
+                
+                best_signal.reasoning = list(set(all_reasoning))  # Remove duplicates
+                resolved_signals.append(best_signal)
+            else:
+                # No conflict - keep all signals or merge similar ones
+                resolved_signals.extend(signal_list)
+        
+        return resolved_signals
 
 class AudioAlertManager:
     def __init__(self):
