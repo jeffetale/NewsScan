@@ -79,7 +79,7 @@ MAJOR_EVENT_THRESHOLD = 0.7   # Threshold for audio alerts
 
 ### Terminal Mode (Default)
 ```bash
-python news_scan.py --mode terminal
+python news_scan.py 
 ```
 
 Features:
@@ -91,7 +91,7 @@ Features:
 
 ### Web Dashboard Mode
 ```bash
-python news_scan.py --mode dashboard
+streamlit run news_scan.py -- --mode dashboard
 ```
 
 Features:
