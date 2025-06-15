@@ -388,29 +388,101 @@ class AdvancedSignalGenerator:
         self.keyword_weights = self._build_keyword_weights()
         
     def _build_keyword_weights(self) -> Dict:
-        """Build weighted keyword dictionary for market impact assessment"""
+        """Build comprehensive weighted keyword dictionary for market impact assessment"""
         return {
-            # High impact economic indicators
-            'inflation': 0.9, 'cpi': 0.9, 'ppi': 0.8, 'pce': 0.8,
-            'unemployment': 0.8, 'nfp': 0.9, 'jobs': 0.7,
-            'gdp': 0.9, 'recession': 0.9, 'growth': 0.7,
+            # TIER 1: CRITICAL MARKET MOVERS (0.85-1.0)
+            # Federal Reserve & Monetary Policy
+            'fomc': 1.0, 'federal reserve': 0.95, 'fed meeting': 1.0, 'powell': 0.9,
+            'interest rate': 0.95, 'rate hike': 0.95, 'rate cut': 0.95, 'fed funds': 0.9,
+            'quantitative easing': 0.9, 'tapering': 0.9, 'balance sheet': 0.85,
+            'dot plot': 0.9, 'jackson hole': 0.85, 'fed minutes': 0.85,
             
-            # Central bank related
-            'federal reserve': 0.9, 'fed': 0.8, 'powell': 0.8,
-            'interest rate': 0.9, 'rate hike': 0.9, 'rate cut': 0.9,
-            'monetary policy': 0.8, 'hawkish': 0.8, 'dovish': 0.8,
+            # Critical Economic Indicators
+            'nonfarm payrolls': 1.0, 'nfp': 1.0, 'unemployment rate': 0.9,
+            'inflation': 0.95, 'cpi': 0.95, 'core cpi': 0.95, 'ppi': 0.85,
+            'pce': 0.9, 'core pce': 0.9, 'gdp': 0.9, 'recession': 1.0,
+            'jobless claims': 0.85, 'ism manufacturing': 0.85, 'ism services': 0.8,
             
-            # Geopolitical
-            'war': 0.8, 'conflict': 0.7, 'sanctions': 0.7,
-            'trade war': 0.8, 'tariff': 0.7,
+            # Market Crisis Terms
+            'market crash': 1.0, 'flash crash': 0.95, 'circuit breaker': 0.9,
+            'vix spike': 0.85, 'volatility surge': 0.8, 'liquidity crisis': 0.95,
+            'margin call': 0.85, 'forced selling': 0.8,
             
-            # Market specific
-            'crash': 0.9, 'rally': 0.7, 'bubble': 0.8,
-            'volatility': 0.6, 'correction': 0.7,
+            # TIER 2: HIGH IMPACT (0.7-0.84)
+            # Central Bank Communications
+            'hawkish': 0.8, 'dovish': 0.8, 'monetary policy': 0.8,
+            'yellen': 0.75, 'brainard': 0.7, 'williams': 0.7, 'clarida': 0.7,
+            'kashkari': 0.7, 'bullard': 0.75, 'fed chair': 0.8,
             
-            # Crypto specific
-            'regulation': 0.8, 'ban': 0.9, 'adoption': 0.7,
-            'institutional': 0.7, 'etf': 0.8
+            # Economic Data
+            'retail sales': 0.8, 'consumer confidence': 0.75, 'consumer sentiment': 0.75,
+            'housing starts': 0.75, 'existing home sales': 0.7, 'new home sales': 0.7,
+            'durable goods': 0.75, 'factory orders': 0.7, 'industrial production': 0.75,
+            'capacity utilization': 0.7, 'productivity': 0.7, 'unit labor costs': 0.7,
+            
+            # Geopolitical & Trade
+            'trade war': 0.8, 'tariff': 0.8, 'sanctions': 0.75, 'trade deal': 0.8,
+            'wto': 0.7, 'usmca': 0.7, 'brexit': 0.8, 'china trade': 0.8,
+            'supply chain': 0.75, 'chip shortage': 0.75, 'energy crisis': 0.8,
+            
+            # Market Structure
+            'earnings season': 0.8, 'guidance': 0.75, 'buyback': 0.7, 'dividend': 0.7,
+            'ipo': 0.7, 'merger': 0.75, 'acquisition': 0.75, 'spinoff': 0.7,
+            'activist investor': 0.7, 'short squeeze': 0.8, 'gamma squeeze': 0.75,
+            
+            # TIER 3: MODERATE IMPACT (0.5-0.69)
+            # Regional Economics
+            'eurozone': 0.65, 'ecb': 0.7, 'lagarde': 0.65, 'bank of england': 0.6,
+            'boe': 0.6, 'bank of japan': 0.6, 'boj': 0.6, 'people\'s bank of china': 0.65,
+            'pboc': 0.65, 'yield curve': 0.65, 'inverted yield curve': 0.8,
+            
+            # Sector Specific
+            'tech earnings': 0.65, 'faang': 0.6, 'magnificent seven': 0.65,
+            'semiconductor': 0.6, 'energy sector': 0.6, 'financials': 0.6,
+            'healthcare': 0.55, 'utilities': 0.5, 'consumer staples': 0.5,
+            
+            # Crypto & Alternative Assets
+            'bitcoin etf': 0.8, 'crypto regulation': 0.75, 'defi': 0.6,
+            'stablecoin': 0.65, 'cbdc': 0.7, 'crypto ban': 0.8, 'mining ban': 0.7,
+            'sec crypto': 0.75, 'gensler': 0.7, 'coinbase': 0.6,
+            
+            # Commodities
+            'oil price': 0.7, 'crude oil': 0.7, 'opec': 0.75, 'natural gas': 0.65,
+            'gold price': 0.6, 'silver': 0.5, 'copper': 0.6, 'wheat': 0.55,
+            'corn': 0.5, 'agricultural': 0.55,
+            
+            # TIER 4: LOWER IMPACT (0.3-0.49)
+            # General Market Terms
+            'stock market': 0.4, 'equity': 0.4, 'bond market': 0.45, 'treasury': 0.45,
+            'yield': 0.4, 'spread': 0.4, 'volatility': 0.45, 'volume': 0.35,
+            'correlation': 0.3, 'beta': 0.3, 'alpha': 0.3,
+            
+            # General Economic Terms
+            'economy': 0.4, 'economic': 0.4, 'growth': 0.45, 'expansion': 0.4,
+            'contraction': 0.45, 'recovery': 0.4, 'slowdown': 0.45,
+            'stimulus': 0.6, 'fiscal policy': 0.55, 'tax cut': 0.5, 'tax increase': 0.5,
+            
+            # Market Sentiment
+            'bullish': 0.35, 'bearish': 0.35, 'rally': 0.4, 'sell-off': 0.45,
+            'correction': 0.55, 'bear market': 0.7, 'bull market': 0.6,
+            'support level': 0.3, 'resistance level': 0.3, 'breakout': 0.35,
+            
+            # Technical Analysis
+            'moving average': 0.3, 'rsi': 0.25, 'macd': 0.25, 'bollinger bands': 0.25,
+            'fibonacci': 0.25, 'trend line': 0.3, 'chart pattern': 0.3,
+            
+            # Company Specific (when they move markets)
+            'apple': 0.4, 'microsoft': 0.4, 'amazon': 0.4, 'google': 0.4, 'tesla': 0.5,
+            'nvidia': 0.5, 'meta': 0.45, 'netflix': 0.4, 'berkshire': 0.4,
+            
+            # Regulatory & Legal
+            'sec': 0.6, 'cftc': 0.55, 'finra': 0.5, 'doj': 0.6, 'antitrust': 0.65,
+            'regulation': 0.55, 'compliance': 0.4, 'fine': 0.5, 'settlement': 0.45,
+            
+            # Global Events
+            'pandemic': 0.8, 'lockdown': 0.7, 'variant': 0.6, 'vaccine': 0.6,
+            'climate change': 0.5, 'natural disaster': 0.6, 'cyber attack': 0.7,
+            'data breach': 0.5, 'ai revolution': 0.6, 'automation': 0.5
         }
     
     def calculate_market_impact(self, text: str) -> float:
@@ -431,110 +503,233 @@ class AdvancedSignalGenerator:
     
     def _analyze_trump_post(self, content: str, sentiment: Dict, market_impact: float, article: Dict) -> List[Signal]:
         """
-        A specialized analyzer for posts from Donald Trump's account.
-        This uses a different, more direct set of rules.
+        Enhanced specialized analyzer for posts from Donald Trump's account.
+        Uses comprehensive keyword matching and market impact assessment.
         """
         signals = []
         content_lower = content.lower()
 
-        # --- THEME 1: TRADE & TARIFFS (China & EU) ---
-        # Keywords that signal new tariffs or escalating trade wars.
-        trade_war_keywords = ['tariff', 'trade war', 'unfair trade', 'intellectual property theft', 'decouple', 'america first', 'china', 'european union', 'eu', 'china tariffs', 'trade deal', 'trade agreement', 'trade imbalance', 'trade deficit', 'protectionism', 'import duties']
+        # --- THEME 1: TRADE & TARIFFS (Enhanced with more keywords) ---
+        trade_war_keywords = [
+            'tariff', 'trade war', 'unfair trade', 'trade deficit', 'trade imbalance',
+            'china tariffs', 'eu tariffs', 'mexico tariffs', 'canada tariffs',
+            'intellectual property', 'ip theft', 'technology transfer', 'forced technology transfer',
+            'dumping', 'subsidies', 'currency manipulation', 'devaluation',
+            'trade deal', 'trade agreement', 'phase one', 'usmca', 'nafta',
+            'wto', 'world trade organization', 'most favored nation', 'mfn',
+            'protectionism', 'america first', 'buy american', 'hire american',
+            'import duties', 'export controls', 'trade restrictions', 'economic sanctions'
+        ]
+        
         if any(word in content_lower for word in trade_war_keywords):
-            # IMPACT: Bearish for SP500 (uncertainty), Bullish for Gold (safe haven), Neutral/Bearish for USD.
+            # Determine severity based on specific keywords
+            severity_multiplier = 1.0
+            if any(severe in content_lower for severe in ['new tariffs', 'increase tariffs', '25%', '50%', 'trade war']):
+                severity_multiplier = 1.2
+            elif any(moderate in content_lower for severe in ['considering', 'reviewing', 'studying']):
+                severity_multiplier = 0.8
+                
             signals.append(Signal(
-                asset='SP500', direction=Direction.BEARISH, strength=self._determine_strength(0.85, market_impact),
-                confidence=0.85, reasoning=["Potential for new tariffs or trade war escalation"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
+                asset='SP500', direction=Direction.BEARISH, 
+                strength=self._determine_strength(0.85 * severity_multiplier, market_impact),
+                confidence=0.85 * severity_multiplier, 
+                reasoning=["Trade war escalation threatens corporate profits and supply chains"],
+                timestamp=datetime.now(), sources=[article.get('url', '')], 
+                sentiment_score=sentiment['composite'], market_impact=market_impact
             ))
             signals.append(Signal(
-                asset='GOLD', direction=Direction.BULLISH, strength=self._determine_strength(0.80, market_impact),
-                confidence=0.80, reasoning=["Trade uncertainty increases safe-haven demand"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-            ))
-
-        # --- THEME 2: FEDERAL RESERVE & INTEREST RATES ---
-        # Keywords related to criticizing or praising the Fed's policy.
-        fed_criticism_keywords = ['fed', 'powell', 'interest rates', 'rate hike', 'too high', 'strong dollar']
-        if any(word in content_lower for word in fed_criticism_keywords):
-            # IMPACT: Usually implies he wants lower rates, which is Bullish for SP500 and Gold.
-            signals.append(Signal(
-                asset='SP500', direction=Direction.BULLISH, strength=self._determine_strength(0.75, market_impact),
-                confidence=0.75, reasoning=["Hints at desire for lower interest rates"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
+                asset='GOLD', direction=Direction.BULLISH, 
+                strength=self._determine_strength(0.80 * severity_multiplier, market_impact),
+                confidence=0.80 * severity_multiplier, 
+                reasoning=["Trade uncertainty increases safe-haven gold demand"],
+                timestamp=datetime.now(), sources=[article.get('url', '')], 
+                sentiment_score=sentiment['composite'], market_impact=market_impact
             ))
             signals.append(Signal(
-                asset='GOLD', direction=Direction.BULLISH, strength=self._determine_strength(0.80, market_impact),
-                confidence=0.80, reasoning=["Lower rates increase gold's appeal as hedge"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-            ))
-            signals.append(Signal(
-                asset='USD', direction=Direction.BEARISH, strength=self._determine_strength(0.70, market_impact),
-                confidence=0.70, reasoning=["Pressure on Fed could weaken the dollar"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-            ))
-
-        # --- THEME 3: DOMESTIC ECONOMY (Praise or Alarm) ---
-        # Keywords boasting about economic performance.
-        economy_praise_keywords = ['strongest economy', 'best ever', 'roaring back', 'tax cuts', 'low taxes', 'lower tax', 'jobs jobs jobs', 'deregulation']
-        if any(word in content_lower for word in economy_praise_keywords):
-            # IMPACT: Directly Bullish for the stock market (SP500).
-            signals.append(Signal(
-                asset='SP500', direction=Direction.BULLISH, strength=self._determine_strength(0.80, market_impact),
-                confidence=0.90, reasoning=["Positive commentary on US economic strength"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
+                asset='USD', direction=Direction.BEARISH, 
+                strength=self._determine_strength(0.70 * severity_multiplier, market_impact),
+                confidence=0.70 * severity_multiplier, 
+                reasoning=["Trade tensions could trigger retaliatory currency measures"],
+                timestamp=datetime.now(), sources=[article.get('url', '')], 
+                sentiment_score=sentiment['composite'], market_impact=market_impact
             ))
 
-        # --- THEME 4: CRYPTOCURRENCY & BITCOIN ---
-        crypto_keywords = ['crypto', 'bitcoin', 'btc', 'cryptocurrency', 'digital asset', 'blockchain', 'decentralized finance', 'ethereum', 'web3', 'nft', 'meme coin']
-        bullish_keywords = ['bullish', 'rally', 'uptrend', 'soaring', 'optimistic', 'buy', 'adoption', 'growth']
-        bearish_keywords = ['bearish', 'crash', 'drop', 'decline', 'pessimistic', 'sell', 'downtrend']
-
-        if any(word in content_lower for word in crypto_keywords):
-            # Check for bullish sentiment keywords first
-            if any(word in content_lower for word in bullish_keywords):
-                signals.append(Signal(
-                    asset='BITCOIN', direction=Direction.BULLISH, strength=self._determine_strength(0.80, market_impact),
-                    confidence=0.80, reasoning=["Positive sentiment on cryptocurrencies"],
-                    timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-                ))
-            # Check for bearish sentiment keywords
-            elif any(word in content_lower for word in bearish_keywords):
-                signals.append(Signal(
-                    asset='BITCOIN', direction=Direction.BEARISH, strength=self._determine_strength(0.80, market_impact),
-                    confidence=0.80, reasoning=["Negative sentiment on cryptocurrencies"],
-                    timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-                ))
-            # Fallback: if no specific keyword match, decide based on overall sentiment
-            else:
-                direction = Direction.BULLISH if sentiment['composite'] >= 0 else Direction.BEARISH
-                reasoning_text = "Overall positive sentiment on cryptocurrencies" if direction == Direction.BULLISH else "Overall negative sentiment on cryptocurrencies"
-                signals.append(Signal(
-                    asset='BITCOIN', direction=direction, strength=self._determine_strength(0.80, market_impact),
-                    confidence=0.80, reasoning=[reasoning_text],
-                    timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-                ))
+        # --- THEME 2: FEDERAL RESERVE & MONETARY POLICY (Enhanced) ---
+        fed_keywords = [
+            'fed', 'federal reserve', 'powell', 'jerome powell', 'jay powell',
+            'interest rates', 'rate hike', 'rate cut', 'fed funds', 'fomc',
+            'monetary policy', 'quantitative easing', 'qe', 'tapering',
+            'balance sheet', 'money printing', 'inflation target',
+            'dot plot', 'fed meeting', 'fed minutes', 'jackson hole',
+            'hawkish', 'dovish', 'tight money', 'loose money', 'easy money',
+            'strong dollar', 'weak dollar', 'dollar policy', 'currency policy'
+        ]
+        
+        if any(word in content_lower for word in fed_keywords):
+            # Assess sentiment toward Fed policy
+            criticism_words = ['wrong', 'mistake', 'bad', 'terrible', 'disaster', 'too high', 'too tight', 'hurting']
+            praise_words = ['good', 'right', 'smart', 'correct', 'appropriate', 'helping']
             
-        # --- THEME 5: GEOPOLITICAL INSTABILITY ---
-        # Keywords related to global conflicts that are not direct trade wars.
-        geopolitical_keywords = ['nato', 'ukraine', 'russia', 'middle east', 'iran', 'china', 'taiwan', 'israel', 'north korea', 'conflict', 'war', 'crisis']
+            fed_sentiment = 0
+            if any(word in content_lower for word in criticism_words):
+                fed_sentiment = -0.8
+            elif any(word in content_lower for word in praise_words):
+                fed_sentiment = 0.8
+            else:
+                fed_sentiment = sentiment['composite']
+                
+            if fed_sentiment < -0.3:  # Criticism suggests desire for easier policy
+                signals.append(Signal(
+                    asset='SP500', direction=Direction.BULLISH, 
+                    strength=self._determine_strength(0.75, market_impact),
+                    confidence=0.75, reasoning=["Fed criticism suggests preference for easier monetary policy"],
+                    timestamp=datetime.now(), sources=[article.get('url', '')], 
+                    sentiment_score=sentiment['composite'], market_impact=market_impact
+                ))
+                signals.append(Signal(
+                    asset='GOLD', direction=Direction.BULLISH, 
+                    strength=self._determine_strength(0.80, market_impact),
+                    confidence=0.80, reasoning=["Pressure for lower rates benefits non-yielding gold"],
+                    timestamp=datetime.now(), sources=[article.get('url', '')], 
+                    sentiment_score=sentiment['composite'], market_impact=market_impact
+                ))
+                signals.append(Signal(
+                    asset='USD', direction=Direction.BEARISH, 
+                    strength=self._determine_strength(0.70, market_impact),
+                    confidence=0.70, reasoning=["Easier monetary policy typically weakens currency"],
+                    timestamp=datetime.now(), sources=[article.get('url', '')], 
+                    sentiment_score=sentiment['composite'], market_impact=market_impact
+                ))
+
+        # --- THEME 3: DOMESTIC ECONOMY & FISCAL POLICY (Enhanced) ---
+        economy_keywords = [
+            'economy', 'economic', 'gdp', 'growth', 'jobs', 'employment', 'unemployment',
+            'tax cuts', 'tax reform', 'corporate tax', 'individual tax', 'capital gains',
+            'deregulation', 'regulation', 'red tape', 'bureaucracy',
+            'infrastructure', 'spending', 'stimulus', 'fiscal policy',
+            'deficit', 'debt', 'budget', 'appropriations', 'congress',
+            'strongest economy', 'best economy', 'greatest economy', 'record',
+            'stock market', 'dow jones', 'all-time high', 'new high'
+        ]
+        
+        positive_economy_words = ['strongest', 'best', 'greatest', 'record', 'amazing', 'incredible', 'fantastic']
+        negative_economy_words = ['terrible', 'worst', 'disaster', 'failing', 'broken', 'crisis']
+        
+        if any(word in content_lower for word in economy_keywords):
+            economy_sentiment = sentiment['composite']
+            if any(word in content_lower for word in positive_economy_words):
+                economy_sentiment = max(economy_sentiment, 0.8)
+            elif any(word in content_lower for word in negative_economy_words):
+                economy_sentiment = min(economy_sentiment, -0.8)
+                
+            if economy_sentiment > 0.3:
+                signals.append(Signal(
+                    asset='SP500', direction=Direction.BULLISH, 
+                    strength=self._determine_strength(0.80, market_impact),
+                    confidence=0.85, reasoning=["Positive economic commentary supports market confidence"],
+                    timestamp=datetime.now(), sources=[article.get('url', '')], 
+                    sentiment_score=sentiment['composite'], market_impact=market_impact
+                ))
+            elif economy_sentiment < -0.3:
+                signals.append(Signal(
+                    asset='SP500', direction=Direction.BEARISH, 
+                    strength=self._determine_strength(0.75, market_impact),
+                    confidence=0.80, reasoning=["Negative economic commentary creates market uncertainty"],
+                    timestamp=datetime.now(), sources=[article.get('url', '')], 
+                    sentiment_score=sentiment['composite'], market_impact=market_impact
+                ))
+
+        # --- THEME 4: CRYPTOCURRENCY & BITCOIN (Enhanced) ---
+        crypto_keywords = [
+            'bitcoin', 'btc', 'cryptocurrency', 'crypto', 'digital currency', 'digital asset',
+            'blockchain', 'mining', 'miners', 'hash rate', 'proof of work',
+            'ethereum', 'eth', 'altcoin', 'defi', 'decentralized finance',
+            'nft', 'non-fungible token', 'web3', 'metaverse',
+            'coinbase', 'binance', 'crypto exchange', 'crypto regulation',
+            'sec crypto', 'cftc crypto', 'treasury crypto', 'irs crypto',
+            'cbdc', 'central bank digital currency', 'fed coin', 'digital dollar',
+            'stablecoin', 'usdc', 'usdt', 'tether', 'stable value',
+            'el salvador', 'legal tender', 'adoption', 'mainstream adoption'
+        ]
+        
+        crypto_positive = ['legal tender', 'adoption', 'innovation', 'future', 'revolutionary', 'freedom', 'decentralized']
+        crypto_negative = ['scam', 'fraud', 'ponzi', 'bubble', 'speculation', 'ban', 'illegal', 'criminal']
+        
+        if any(word in content_lower for word in crypto_keywords):
+            crypto_sentiment = sentiment['composite']
+            if any(word in content_lower for word in crypto_positive):
+                crypto_sentiment = max(crypto_sentiment, 0.7)
+            elif any(word in content_lower for word in crypto_negative):
+                crypto_sentiment = min(crypto_sentiment, -0.7)
+                
+            direction = Direction.BULLISH if crypto_sentiment >= 0 else Direction.BEARISH
+            reasoning_text = ("Positive cryptocurrency sentiment from influential figure" if direction == Direction.BULLISH 
+                            else "Negative cryptocurrency sentiment from influential figure")
+            
+            signals.append(Signal(
+                asset='BITCOIN', direction=direction, 
+                strength=self._determine_strength(0.85, market_impact),
+                confidence=0.85, reasoning=[reasoning_text],
+                timestamp=datetime.now(), sources=[article.get('url', '')], 
+                sentiment_score=sentiment['composite'], market_impact=market_impact
+            ))
+
+        # --- THEME 5: GEOPOLITICAL & FOREIGN POLICY (Enhanced) ---
+        geopolitical_keywords = [
+            'china', 'chinese', 'xi jinping', 'ccp', 'beijing', 'hong kong', 'taiwan',
+            'russia', 'russian', 'putin', 'moscow', 'ukraine', 'crimea',
+            'iran', 'iranian', 'middle east', 'nuclear', 'sanctions',
+            'north korea', 'kim jong', 'pyongyang', 'nuclear weapons',
+            'nato', 'european union', 'eu', 'brexit', 'germany', 'france',
+            'israel', 'palestine', 'syria', 'afghanistan', 'iraq',
+            'military', 'defense', 'war', 'conflict', 'peace', 'treaty',
+            'allies', 'alliance', 'partnership', 'diplomacy', 'summit',
+            'trade partner', 'economic partner', 'strategic partner'
+        ]
+        
+        conflict_words = ['war', 'conflict', 'tension', 'crisis', 'threat', 'hostile', 'enemy']
+        cooperation_words = ['deal', 'agreement', 'cooperation', 'partnership', 'alliance', 'friend']
+        
         if any(word in content_lower for word in geopolitical_keywords):
-            # IMPACT: General uncertainty is a flight to safety, bullish for USD and Gold.
-            signals.append(Signal(
-                asset='GOLD', direction=Direction.BULLISH, strength=self._determine_strength(0.80, market_impact),
-                confidence=0.80, reasoning=["Geopolitical uncertainty drives safe-haven demand"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-            ))
-            signals.append(Signal(
-                asset='USD', direction=Direction.BULLISH, strength=self._determine_strength(0.70, market_impact),
-                confidence=0.70, reasoning=["USD seen as safe haven during global instability"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-            ))
-            signals.append(Signal(
-                asset='SP500', direction=Direction.BEARISH, strength=self._determine_strength(0.75, market_impact),
-                confidence=0.75, reasoning=["Geopolitical tensions create market uncertainty"],
-                timestamp=datetime.now(), sources=[article.get('url', '')], sentiment_score=sentiment['composite'], market_impact=market_impact
-            ))
+            geo_sentiment = sentiment['composite']
+            if any(word in content_lower for word in conflict_words):
+                geo_sentiment = min(geo_sentiment, -0.5)
+            elif any(word in content_lower for word in cooperation_words):
+                geo_sentiment = max(geo_sentiment, 0.5)
+                
+            if geo_sentiment < -0.2:  # Negative geopolitical sentiment
+                signals.append(Signal(
+                    asset='GOLD', direction=Direction.BULLISH, 
+                    strength=self._determine_strength(0.80, market_impact),
+                    confidence=0.80, reasoning=["Geopolitical tensions increase safe-haven demand"],
+                    timestamp=datetime.now(), sources=[article.get('url', '')], 
+                    sentiment_score=sentiment['composite'], market_impact=market_impact
+                ))
+                signals.append(Signal(
+                    asset='SP500', direction=Direction.BEARISH, 
+                    strength=self._determine_strength(0.70, market_impact),
+                    confidence=0.75, reasoning=["Geopolitical uncertainty creates market volatility"],
+                    timestamp=datetime.now(), sources=[article.get('url', '')], 
+                    sentiment_score=sentiment['composite'], market_impact=market_impact
+                ))
+                
+                # USD can be both safe haven and hurt by trade tensions
+                if 'china' in content_lower or 'trade' in content_lower:
+                    signals.append(Signal(
+                        asset='USD', direction=Direction.BEARISH, 
+                        strength=self._determine_strength(0.65, market_impact),
+                        confidence=0.65, reasoning=["Trade tensions may hurt dollar through reduced global trade"],
+                        timestamp=datetime.now(), sources=[article.get('url', '')], 
+                        sentiment_score=sentiment['composite'], market_impact=market_impact
+                    ))
+                else:
+                    signals.append(Signal(
+                        asset='USD', direction=Direction.BULLISH, 
+                        strength=self._determine_strength(0.70, market_impact),
+                        confidence=0.70, reasoning=["USD benefits as global safe haven during tensions"],
+                        timestamp=datetime.now(), sources=[article.get('url', '')], 
+                        sentiment_score=sentiment['composite'], market_impact=market_impact
+                    ))
 
         return signals
     
@@ -624,121 +819,491 @@ class AdvancedSignalGenerator:
             reasoning=reasoning,
             timestamp=datetime.now(),
             sources=[article.get('url', '')],
-            sentiment_score=final_sentiment_score, # <-- Use the adjusted score
+            sentiment_score=final_sentiment_score,
             market_impact=market_impact
         )
     
     def _analyze_gold(self, content: str, sentiment: Dict) -> Tuple[Direction, List[str]]:
-        """Gold-specific analysis logic"""
+        """Enhanced Gold-specific analysis with comprehensive keyword coverage"""
         reasoning = []
         direction = Direction.NEUTRAL
+        content_lower = content.lower()
         
-        # Inflation hedge logic
-        if any(word in content for word in ['inflation', 'cpi', 'ppi']):
-            if 'high' in content or 'rising' in content or sentiment['composite'] > 0.3:
+        # BULLISH FACTORS FOR GOLD
+        
+        # Inflation & Currency Debasement (High Impact)
+        inflation_keywords = ['inflation', 'cpi', 'core cpi', 'ppi', 'pce', 'core pce', 
+                            'price increases', 'cost of living', 'purchasing power',
+                            'money printing', 'quantitative easing', 'qe', 'currency debasement',
+                            'fiscal stimulus', 'government spending', 'deficit spending']
+        
+        if any(keyword in content_lower for keyword in inflation_keywords):
+            inflation_indicators = ['rising', 'increasing', 'surge', 'spike', 'above target', 'elevated', 'persistent']
+            if any(indicator in content_lower for indicator in inflation_indicators) or sentiment['composite'] > 0.2:
                 direction = Direction.BULLISH
-                reasoning.append("Rising inflation increases gold's appeal as hedge")
+                reasoning.append("Rising inflation increases gold's appeal as inflation hedge")
         
-        # Safe haven demand
-        if any(word in content for word in ['uncertainty', 'crisis', 'war', 'conflict']):
+        # Safe Haven Demand (High Impact)
+        safe_haven_keywords = ['geopolitical tension', 'war', 'conflict', 'crisis', 'uncertainty',
+                            'market volatility', 'stock market crash', 'recession fears', 
+                            'economic instability', 'banking crisis', 'financial crisis',
+                            'trade war', 'sanctions', 'political instability', 'election uncertainty',
+                            'brexit', 'sovereign debt', 'debt crisis', 'currency crisis']
+        
+        if any(keyword in content_lower for keyword in safe_haven_keywords):
             direction = Direction.BULLISH
-            reasoning.append("Geopolitical uncertainty drives safe-haven demand")
+            reasoning.append("Crisis conditions drive safe-haven demand for gold")
         
-        # Interest rate impact
-        if any(word in content for word in ['rate hike', 'hawkish', 'tightening']):
-            direction = Direction.BEARISH
-            reasoning.append("Higher rates increase opportunity cost of holding gold")
+        # Central Bank Policy (Variable Impact)
+        dovish_keywords = ['dovish', 'accommodative', 'easy money', 'low rates', 'rate cut',
+                        'monetary stimulus', 'negative rates', 'yield curve control']
         
-        # Dollar strength
-        if 'dollar strength' in content or 'strong dollar' in content:
-            direction = Direction.BEARISH
-            reasoning.append("Strong dollar makes gold more expensive for foreign buyers")
+        if any(keyword in content_lower for keyword in dovish_keywords):
+            direction = Direction.BULLISH
+            reasoning.append("Accommodative monetary policy reduces opportunity cost of holding gold")
+        
+        # Dollar Weakness (Moderate Impact)
+        weak_dollar_keywords = ['weak dollar', 'dollar decline', 'dollar weakness', 'dxy falling',
+                            'currency devaluation', 'competitive devaluation']
+        
+        if any(keyword in content_lower for keyword in weak_dollar_keywords):
+            direction = Direction.BULLISH
+            reasoning.append("Dollar weakness makes gold cheaper for international buyers")
+        
+        # Central Bank Buying (Moderate Impact)
+        cb_buying_keywords = ['central bank buying', 'reserve diversification', 'gold reserves',
+                            'official sector demand', 'sovereign buying']
+        
+        if any(keyword in content_lower for keyword in cb_buying_keywords):
+            direction = Direction.BULLISH
+            reasoning.append("Central bank gold purchases support price")
+        
+        # BEARISH FACTORS FOR GOLD
+        
+        # Rising Interest Rates (High Impact)
+        hawkish_keywords = ['hawkish', 'tightening', 'rate hike', 'higher rates', 'restrictive policy',
+                        'fed tightening', 'monetary tightening', 'normalize rates', 'rate increase']
+        
+        if any(keyword in content_lower for keyword in hawkish_keywords):
+            if direction != Direction.BULLISH:  # Don't override bullish signals
+                direction = Direction.BEARISH
+                reasoning.append("Rising interest rates increase opportunity cost of holding non-yielding gold")
+        
+        # Strong Dollar (High Impact)
+        strong_dollar_keywords = ['strong dollar', 'dollar strength', 'dxy rising', 'dollar rally',
+                                'dollar appreciation', 'dollar index up']
+        
+        if any(keyword in content_lower for keyword in strong_dollar_keywords):
+            if direction != Direction.BULLISH:
+                direction = Direction.BEARISH
+                reasoning.append("Strong dollar makes gold more expensive for foreign buyers")
+        
+        # Risk-On Sentiment (Moderate Impact)
+        risk_on_keywords = ['risk appetite', 'risk-on', 'market optimism', 'equity rally',
+                        'growth optimism', 'economic recovery', 'market confidence']
+        
+        if any(keyword in content_lower for keyword in risk_on_keywords):
+            if direction != Direction.BULLISH and sentiment['composite'] > 0.3:
+                direction = Direction.BEARISH
+                reasoning.append("Risk-on sentiment reduces safe-haven demand for gold")
+        
+        # Technical Factors
+        technical_bearish = ['gold sell-off', 'gold decline', 'gold weakness', 'support broken',
+                            'technical breakdown', 'selling pressure']
+        
+        if any(keyword in content_lower for keyword in technical_bearish):
+            if direction != Direction.BULLISH:
+                direction = Direction.BEARISH
+                reasoning.append("Technical selling pressure weighs on gold prices")
         
         return direction, reasoning
     
     def _analyze_bitcoin(self, content: str, sentiment: Dict) -> Tuple[Direction, List[str]]:
-        """Bitcoin-specific analysis logic"""
+        """Enhanced Bitcoin-specific analysis with comprehensive coverage"""
         reasoning = []
         direction = Direction.NEUTRAL
+        content_lower = content.lower()
         
-        # Regulatory news
-        if any(word in content for word in ['regulation', 'ban', 'legal']):
-            if sentiment['composite'] < -0.2:
-                direction = Direction.BEARISH
-                reasoning.append("Negative regulatory developments")
-            elif sentiment['composite'] > 0.2:
-                direction = Direction.BULLISH
-                reasoning.append("Positive regulatory clarity")
+        # BULLISH FACTORS FOR BITCOIN
         
-        # Institutional adoption
-        if any(word in content for word in ['institutional', 'etf', 'adoption', 'corporate']):
+        # Institutional Adoption (High Impact)
+        institutional_keywords = ['institutional adoption', 'corporate treasury', 'bitcoin etf', 'etf approval',
+                                'wall street', 'goldman sachs', 'jp morgan', 'morgan stanley', 'blackrock',
+                                'fidelity', 'grayscale', 'microstrategy', 'tesla bitcoin', 'corporate buying',
+                                'pension fund', 'endowment', 'sovereign wealth fund', 'family office']
+        
+        if any(keyword in content_lower for keyword in institutional_keywords):
             if sentiment['composite'] > 0.1:
                 direction = Direction.BULLISH
-                reasoning.append("Institutional adoption increases legitimacy")
+                reasoning.append("Institutional adoption increases Bitcoin legitimacy and demand")
         
-        # Risk-off sentiment
-        if any(word in content for word in ['risk-off', 'uncertainty', 'volatility']):
-            direction = Direction.BEARISH
-            reasoning.append("Risk-off sentiment affects crypto markets")
+        # Positive Regulatory Development (High Impact)
+        positive_reg_keywords = ['regulatory clarity', 'crypto regulation', 'legal framework', 'bitcoin legal',
+                                'sec approval', 'cftc commodity', 'legal tender', 'regulatory approval',
+                                'compliance framework', 'institutional custody', 'regulated exchange']
         
-        # Technology developments
-        if any(word in content for word in ['blockchain', 'innovation', 'upgrade']):
+        if any(keyword in content_lower for keyword in positive_reg_keywords):
             if sentiment['composite'] > 0.2:
                 direction = Direction.BULLISH
-                reasoning.append("Positive technology developments")
+                reasoning.append("Positive regulatory developments provide clarity and institutional confidence")
+        
+        # Technological Progress (Moderate Impact)
+        tech_keywords = ['lightning network', 'taproot', 'bitcoin upgrade', 'scaling solution',
+                        'layer 2', 'bitcoin mining', 'hash rate', 'network security', 'decentralization',
+                        'bitcoin development', 'protocol improvement', 'bitcoin core']
+        
+        if any(keyword in content_lower for keyword in tech_keywords):
+            if sentiment['composite'] > 0.2:
+                direction = Direction.BULLISH
+                reasoning.append("Technological improvements enhance Bitcoin's utility and adoption")
+        
+        # Inflation Hedge Narrative (Moderate Impact)
+        inflation_hedge_keywords = ['digital gold', 'store of value', 'inflation hedge', 'currency debasement',
+                                'monetary inflation', 'bitcoin vs gold', 'hard asset', 'scarce asset',
+                                'fixed supply', '21 million', 'halving', 'stock to flow']
+        
+        if any(keyword in content_lower for keyword in inflation_hedge_keywords):
+            if sentiment['composite'] > 0.1:
+                direction = Direction.BULLISH
+                reasoning.append("Bitcoin gaining acceptance as digital store of value and inflation hedge")
+        
+        # Network Growth (Moderate Impact)
+        network_keywords = ['bitcoin adoption', 'user growth', 'wallet addresses', 'transaction volume',
+                        'payment adoption', 'merchant acceptance', 'bitcoin payments', 'on-chain metrics',
+                        'active addresses', 'bitcoin usage']
+        
+        if any(keyword in content_lower for keyword in network_keywords):
+            if sentiment['composite'] > 0.2:
+                direction = Direction.BULLISH
+                reasoning.append("Growing network usage demonstrates increasing utility")
+        
+        # BEARISH FACTORS FOR BITCOIN
+        
+        # Regulatory Crackdown (High Impact)
+        negative_reg_keywords = ['crypto ban', 'bitcoin ban', 'mining ban', 'exchange ban', 'regulatory crackdown',
+                                'sec lawsuit', 'cftc action', 'doj investigation', 'illegal', 'criminal activity',
+                                'aml concerns', 'kyc requirements', 'tax evasion', 'money laundering']
+        
+        if any(keyword in content_lower for keyword in negative_reg_keywords):
+            if sentiment['composite'] < -0.1:
+                direction = Direction.BEARISH
+                reasoning.append("Regulatory crackdowns create uncertainty and restrict access")
+        
+        # Environmental Concerns (Moderate Impact)
+        environmental_keywords = ['bitcoin energy', 'mining energy', 'carbon footprint', 'environmental impact',
+                                'energy consumption', 'fossil fuels', 'renewable energy', 'green mining',
+                                'sustainability', 'esg concerns', 'climate change', 'carbon emissions']
+        
+        if any(keyword in content_lower for keyword in environmental_keywords):
+            if sentiment['composite'] < -0.2:
+                direction = Direction.BEARISH
+                reasoning.append("Environmental concerns create regulatory and adoption headwinds")
+        
+        # Market Risk-Off Sentiment (High Impact)
+        risk_off_keywords = ['risk-off', 'market crash', 'liquidity crisis', 'margin calls', 'deleveraging',
+                            'crypto winter', 'bear market', 'sell-off', 'flight to safety', 'risk aversion',
+                            'correlation breakdown', 'crypto contagion']
+        
+        if any(keyword in content_lower for keyword in risk_off_keywords):
+            direction = Direction.BEARISH
+            reasoning.append("Risk-off sentiment pressures speculative assets like Bitcoin")
+        
+        # Exchange/Infrastructure Issues (High Impact)
+        infrastructure_keywords = ['exchange hack', 'wallet hack', 'crypto theft', 'exchange collapse',
+                                'ftx', 'celsius', 'luna', 'ust', 'stablecoin depeg', 'crypto fraud',
+                                'ponzi scheme', 'rug pull', 'smart contract exploit']
+        
+        if any(keyword in content_lower for keyword in infrastructure_keywords):
+            if sentiment['composite'] < -0.2:
+                direction = Direction.BEARISH
+                reasoning.append("Infrastructure failures and fraud damage crypto ecosystem confidence")
+        
+        # Technical Breakdown (Moderate Impact)
+        technical_bearish = ['bitcoin breakdown', 'support broken', 'death cross', 'technical sell-off',
+                            'whale selling', 'miner selling', 'long liquidation', 'funding negative']
+        
+        if any(keyword in content_lower for keyword in technical_bearish):
+            if direction != Direction.BULLISH:
+                direction = Direction.BEARISH
+                reasoning.append("Technical breakdown triggers algorithmic and momentum selling")
+        
+        # Interest Rate Impact (Moderate Impact)
+        rates_keywords = ['interest rates', 'fed hikes', 'monetary tightening', 'liquidity drain',
+                        'risk-free rate', 'opportunity cost', 'yield competition']
+        
+        if any(keyword in content_lower for keyword in rates_keywords):
+            if sentiment['composite'] < -0.1:
+                if direction != Direction.BULLISH:
+                    direction = Direction.BEARISH
+                    reasoning.append("Rising rates increase opportunity cost of holding non-yielding Bitcoin")
         
         return direction, reasoning
-    
+
     def _analyze_sp500(self, content: str, sentiment: Dict) -> Tuple[Direction, List[str]]:
-        """S&P 500 specific analysis logic"""
+        """Enhanced S&P 500 specific analysis with comprehensive coverage"""
         reasoning = []
         direction = Direction.NEUTRAL
+        content_lower = content.lower()
         
-        # Economic growth
-        if any(word in content for word in ['gdp', 'growth', 'expansion']):
+        # BULLISH FACTORS FOR S&P 500
+        
+        # Economic Growth (High Impact)
+        growth_keywords = ['gdp growth', 'economic expansion', 'robust growth', 'strong economy',
+                        'consumer spending', 'business investment', 'capex', 'productivity growth',
+                        'employment growth', 'wage growth', 'economic recovery', 'v-shaped recovery']
+        
+        if any(keyword in content_lower for keyword in growth_keywords):
             if sentiment['composite'] > 0.2:
                 direction = Direction.BULLISH
-                reasoning.append("Strong economic growth supports equities")
-            elif sentiment['composite'] < -0.2:
-                direction = Direction.BEARISH
-                reasoning.append("Economic slowdown concerns")
+                reasoning.append("Strong economic growth supports corporate earnings and valuations")
         
-        # Fed policy
-        if any(word in content for word in ['fed', 'federal reserve', 'powell']):
-            if 'dovish' in content or 'rate cut' in content:
-                direction = Direction.BULLISH
-                reasoning.append("Accommodative Fed policy supports risk assets")
-            elif 'hawkish' in content or 'rate hike' in content:
-                direction = Direction.BEARISH
-                reasoning.append("Tighter monetary policy pressures valuations")
+        # Federal Reserve Policy (Variable Impact)
+        dovish_fed_keywords = ['dovish fed', 'accommodative policy', 'easy money', 'rate cuts', 'fed pivot',
+                            'pause rate hikes', 'lower for longer', 'quantitative easing', 'balance sheet expansion',
+                            'fed put', 'powell dovish', 'soft landing']
         
-        # Earnings and corporate news
-        if any(word in content for word in ['earnings', 'profit', 'revenue']):
+        if any(keyword in content_lower for keyword in dovish_fed_keywords):
+            direction = Direction.BULLISH
+            reasoning.append("Accommodative Fed policy supports risk asset valuations")
+        
+        # Corporate Earnings (High Impact)
+        earnings_keywords = ['strong earnings', 'earnings beat', 'revenue growth', 'profit margins',
+                            'earnings guidance', 'eps growth', 'record profits', 'margin expansion',
+                            'operating leverage', 'cost control', 'pricing power', 'earnings season']
+        
+        if any(keyword in content_lower for keyword in earnings_keywords):
             if sentiment['composite'] > 0.3:
                 direction = Direction.BULLISH
-                reasoning.append("Strong corporate fundamentals")
+                reasoning.append("Strong corporate fundamentals justify higher equity valuations")
         
-        return direction, reasoning
-    
-    def _analyze_usd(self, content: str, sentiment: Dict) -> Tuple[Direction, List[str]]:
-        """USD specific analysis logic"""
-        reasoning = []
-        direction = Direction.NEUTRAL
+        # Market Technicals (Moderate Impact)
+        technical_bullish = ['breakout', 'new highs', 'all-time high', 'momentum', 'bullish pattern',
+                            'support holding', 'golden cross', 'trend intact', 'buying pressure',
+                            'institutional buying', 'retail inflows', 'etf inflows']
         
-        # Fed policy impact
-        if any(word in content for word in ['fed', 'federal reserve']):
-            if 'hawkish' in content or 'rate hike' in content:
-                direction = Direction.BULLISH
-                reasoning.append("Hawkish Fed policy strengthens dollar")
-            elif 'dovish' in content or 'rate cut' in content:
-                direction = Direction.BEARISH
-                reasoning.append("Dovish Fed policy weakens dollar")
-        
-        # Economic data
-        if any(word in content for word in ['nfp', 'unemployment', 'jobs']):
+        if any(keyword in content_lower for keyword in technical_bullish):
             if sentiment['composite'] > 0.2:
                 direction = Direction.BULLISH
-                reasoning.append("Strong employment data supports USD")
+                reasoning.append("Positive technical signals and fund flows support continued uptrend")
+        
+        # Sector Rotation (Moderate Impact)
+        sector_strength = ['tech rally', 'growth stocks', 'innovation', 'ai revolution', 'digital transformation',
+                        'cloud computing', 'semiconductor strength', 'biotech breakthrough', 'energy transition',
+                        'infrastructure spending', 'reshoring', 'nearshoring']
+        
+        if any(keyword in content_lower for keyword in sector_strength):
+            if sentiment['composite'] > 0.2:
+                direction = Direction.BULLISH
+                reasoning.append("Sector strength and thematic trends drive market leadership")
+        
+        # BEARISH FACTORS FOR S&P 500
+        
+        # Economic Recession (High Impact)
+        recession_keywords = ['recession', 'economic contraction', 'gdp decline', 'negative growth',
+                            'hard landing', 'economic slowdown', 'consumer weakness', 'spending decline',
+                            'layoffs', 'unemployment rising', 'jobless claims', 'leading indicators']
+        
+        if any(keyword in content_lower for keyword in recession_keywords):
+            if sentiment['composite'] < -0.2:
+                direction = Direction.BEARISH
+                reasoning.append("Recession fears and economic weakness pressure corporate earnings")
+        
+        # Federal Reserve Hawkishness (High Impact)
+        hawkish_fed_keywords = ['hawkish fed', 'aggressive tightening', 'rate hikes', 'higher for longer',
+                            'quantitative tightening', 'qt', 'balance sheet reduction', 'restrictive policy',
+                            'powell hawkish', 'fed tightening', 'monetary restraint', 'liquidity drain']
+        
+        if any(keyword in content_lower for keyword in hawkish_fed_keywords):
+            direction = Direction.BEARISH
+            reasoning.append("Hawkish Fed policy increases discount rates and pressures valuations")
+        
+        # Inflation Concerns (Moderate Impact)
+        inflation_keywords = ['inflation surge', 'price pressures', 'cost inflation', 'margin compression',
+                            'input costs', 'wage inflation', 'cpi spike', 'pce elevated', 'pricing power',
+                            'pass-through', 'inflation expectations']
+        
+        if any(keyword in content_lower for keyword in inflation_keywords):
+            if sentiment['composite'] < -0.1:
+                if direction != Direction.BULLISH:
+                    direction = Direction.BEARISH
+                    reasoning.append("Inflation pressures corporate margins and may force Fed tightening")
+        
+        # Earnings Concerns (High Impact)
+        earnings_concerns = ['earnings miss', 'guidance cut', 'margin pressure', 'revenue decline',
+                            'profit warning', 'earnings recession', 'multiple compression', 'valuation reset',
+                            'eps decline', 'cost pressures', 'demand destruction']
+        
+        if any(keyword in content_lower for keyword in earnings_concerns):
+            if sentiment['composite'] < -0.2:
+                direction = Direction.BEARISH
+                reasoning.append("Earnings deterioration undermines equity valuations")
+        
+        # Geopolitical Risks (Moderate Impact)
+        geopolitical_keywords = ['trade war', 'geopolitical tension', 'supply chain', 'tariffs', 'sanctions',
+                                'war', 'conflict', 'energy crisis', 'commodity shock', 'deglobalization',
+                                'china tensions', 'taiwan', 'middle east', 'russia ukraine']
+        
+        if any(keyword in content_lower for keyword in geopolitical_keywords):
+            if sentiment['composite'] < -0.2:
+                if direction != Direction.BULLISH:
+                    direction = Direction.BEARISH
+                    reasoning.append("Geopolitical risks create uncertainty and disrupt business operations")
+        
+        # Technical Breakdown (Moderate Impact)
+        technical_bearish = ['breakdown', 'support broken', 'death cross', 'selling pressure', 'distribution',
+                            'insider selling', 'margin calls', 'forced selling', 'volatility spike', 'vix surge',
+                            'risk-off', 'flight to quality']
+        
+        if any(keyword in content_lower for keyword in technical_bearish):
+            if direction != Direction.BULLISH:
+                direction = Direction.BEARISH
+                reasoning.append("Technical breakdown and risk-off sentiment pressure equity markets")
+        
+        # Banking/Financial System (High Impact)
+        financial_stress = ['banking crisis', 'credit crunch', 'loan losses', 'financial instability',
+                        'bank failures', 'liquidity crisis', 'credit tightening', 'yield curve inversion',
+                        'term premium', 'credit spreads', 'systemic risk']
+        
+        if any(keyword in content_lower for keyword in financial_stress):
+            if sentiment['composite'] < -0.3:
+                direction = Direction.BEARISH
+                reasoning.append("Financial system stress threatens economic growth and market stability")
+        
+        return direction, reasoning
+
+    def _analyze_usd(self, content: str, sentiment: Dict) -> Tuple[Direction, List[str]]:
+        """Enhanced USD specific analysis with comprehensive coverage"""
+        reasoning = []
+        direction = Direction.NEUTRAL
+        content_lower = content.lower()
+        
+        # BULLISH FACTORS FOR USD
+        
+        # Federal Reserve Hawkishness (High Impact)
+        hawkish_fed_keywords = ['hawkish fed', 'rate hikes', 'aggressive tightening', 'restrictive policy',
+                            'higher for longer', 'fed tightening', 'monetary restraint', 'quantitative tightening',
+                            'powell hawkish', 'fed funds rate', 'terminal rate', 'neutral rate']
+        
+        if any(keyword in content_lower for keyword in hawkish_fed_keywords):
+            if sentiment['composite'] > -0.1:  # Not overly negative
+                direction = Direction.BULLISH
+                reasoning.append("Hawkish Fed policy attracts capital flows and strengthens dollar")
+        
+        # US Economic Outperformance (High Impact)
+        economic_strength = ['us growth', 'gdp outperformance', 'economic resilience', 'consumer strength',
+                            'labor market', 'job growth', 'productivity', 'competitiveness', 'innovation',
+                            'energy independence', 'manufacturing renaissance', 'reshoring']
+        
+        if any(keyword in content_lower for keyword in economic_strength):
+            if sentiment['composite'] > 0.2:
+                direction = Direction.BULLISH
+                reasoning.append("US economic outperformance supports dollar strength")
+        
+        # Safe Haven Demand (High Impact)
+        safe_haven_keywords = ['safe haven', 'flight to quality', 'risk-off', 'global uncertainty',
+                            'geopolitical tension', 'market volatility', 'financial crisis', 'recession fears',
+                            'banking crisis', 'sovereign debt', 'emerging market crisis', 'capital flight']
+        
+        if any(keyword in content_lower for keyword in safe_haven_keywords):
+            direction = Direction.BULLISH
+            reasoning.append("Safe haven flows during uncertainty strengthen the dollar")
+        
+        # Interest Rate Differential (High Impact)
+        rate_differential = ['yield advantage', 'rate differential', 'carry trade', 'real rates',
+                            'nominal rates', 'interest rate parity', 'yield curve', 'term premium',
+                            'bond yields', 'treasury yields', 'funding costs']
+        
+        if any(keyword in content_lower for keyword in rate_differential):
+            if sentiment['composite'] > 0.1:
+                direction = Direction.BULLISH
+                reasoning.append("Favorable interest rate differentials attract foreign investment")
+        
+        # Strong Employment Data (Moderate Impact)
+        employment_keywords = ['nonfarm payrolls', 'nfp', 'job creation', 'unemployment rate', 'jobless claims',
+                            'labor participation', 'wage growth', 'job openings', 'quits rate', 'hiring',
+                            'employment cost index', 'labor shortage']
+        
+        if any(keyword in content_lower for keyword in employment_keywords):
+            if sentiment['composite'] > 0.2:
+                direction = Direction.BULLISH
+                reasoning.append("Strong employment data supports Fed tightening expectations and USD")
+        
+        # BEARISH FACTORS FOR USD
+        
+        # Federal Reserve Dovishness (High Impact)
+        dovish_fed_keywords = ['dovish fed', 'accommodative policy', 'rate cuts', 'fed pivot', 'pause',
+                            'lower for longer', 'quantitative easing', 'balance sheet expansion', 'fed put',
+                            'soft landing', 'growth concerns', 'employment mandate']
+        
+        if any(keyword in content_lower for keyword in dovish_fed_keywords):
+            direction = Direction.BEARISH
+            reasoning.append("Dovish Fed policy reduces yield advantage and weakens dollar")
+        
+        # US Economic Weakness (High Impact)
+        economic_weakness = ['us recession', 'gdp contraction', 'economic slowdown', 'consumer weakness',
+                            'business investment decline', 'productivity decline', 'competitiveness loss',
+                            'trade deficit', 'current account deficit', 'twin deficits']
+        
+        if any(keyword in content_lower for keyword in economic_weakness):
+            if sentiment['composite'] < -0.2:
+                direction = Direction.BEARISH
+                reasoning.append("US economic weakness undermines dollar fundamentals")
+        
+        # Fiscal Concerns (Moderate Impact)
+        fiscal_keywords = ['budget deficit', 'government debt', 'debt ceiling', 'fiscal sustainability',
+                        'debt-to-gdp', 'crowding out', 'fiscal dominance', 'unfunded liabilities',
+                        'social security', 'medicare', 'infrastructure spending']
+        
+        if any(keyword in content_lower for keyword in fiscal_keywords):
+            if sentiment['composite'] < -0.2:
+                if direction != Direction.BULLISH:
+                    direction = Direction.BEARISH
+                    reasoning.append("Fiscal concerns raise questions about long-term dollar stability")
+        
+        # International Developments (Variable Impact)
+        international_keywords = ['dedollarization', 'reserve currency', 'swift alternatives', 'digital currencies',
+                                'cbdc', 'yuan internationalization', 'brics currency', 'commodity currencies',
+                                'petrodollar', 'euro strength', 'yen intervention']
+        
+        if any(keyword in content_lower for keyword in international_keywords):
+            if sentiment['composite'] < -0.1:
+                if direction != Direction.BULLISH:
+                    direction = Direction.BEARISH
+                    reasoning.append("Challenges to dollar's international role create headwinds")
+        
+        # Trade and Current Account (Moderate Impact)
+        trade_keywords = ['trade deficit', 'current account', 'export competitiveness', 'import surge',
+                        'trade balance', 'goods deficit', 'services surplus', 'investment flows',
+                        'capital account', 'balance of payments']
+        
+        if any(keyword in content_lower for keyword in trade_keywords):
+            if sentiment['composite'] < -0.2:
+                if direction != Direction.BULLISH:
+                    direction = Direction.BEARISH
+                    reasoning.append("Trade and current account deficits create dollar selling pressure")
+        
+        # Technical Factors (Moderate Impact)
+        technical_bearish = ['dollar breakdown', 'dxy decline', 'support broken', 'trend reversal',
+                            'technical selling', 'momentum loss', 'overbought correction', 'profit taking']
+        
+        if any(keyword in content_lower for keyword in technical_bearish):
+            if direction != Direction.BULLISH:
+                direction = Direction.BEARISH
+                reasoning.append("Technical breakdown triggers algorithmic and momentum selling")
+        
+        # Energy Prices (Variable Impact - Complex relationship)
+        energy_keywords = ['oil prices', 'energy crisis', 'gas prices', 'commodity prices', 'inflation',
+                        'energy independence', 'shale production', 'strategic reserve', 'opec']
+        
+        if any(keyword in content_lower for keyword in energy_keywords):
+            if 'energy independence' in content_lower or 'shale production' in content_lower:
+                if sentiment['composite'] > 0.1 and direction != Direction.BEARISH:
+                    direction = Direction.BULLISH
+                    reasoning.append("US energy independence strengthens dollar fundamentals")
+            elif sentiment['composite'] < -0.2 and 'crisis' in content_lower:
+                if direction != Direction.BULLISH:
+                    direction = Direction.BEARISH
+                    reasoning.append("Energy crisis creates inflationary pressures and economic headwinds")
         
         return direction, reasoning
     
